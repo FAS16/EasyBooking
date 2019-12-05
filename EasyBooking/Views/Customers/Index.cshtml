@@ -1,0 +1,67 @@
+﻿@model System.Collections.Generic.List<EasyBooking.Models.Customer>
+
+@{
+    ViewBag.Title = "Customers";
+}
+
+<h2>Customers</h2>
+@Html.ActionLink("Add customer", "Add", "Customers", null, new { @class = "btn-btm-margin btn btn-primary" })
+
+<table id="customers" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th class="delete-x"><b>x</b></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var customer in Model)
+        {
+            <tr>
+                <td>@customer.Id</td>
+                <td>@Html.ActionLink(customer.Name, "Edit", "Customers", new { id = customer.Id }, null)</td>
+                <td>@customer.PhoneNumber</td>
+                <td>
+                    <button customer-id-attr="@customer.Id" class="btn-link js-del">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+
+</table>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+           var table = $("#customers").DataTable();
+
+            // Get the customers table, listen to click event, and if the click event is raised from an element matching the selector "js-delete"   
+            $("#customers").on("click",".js-del",
+                function () {
+                    var button = $(this);
+
+                    bootbox.confirm("Are you sure you want to delete this customer?", function(result) {
+                        if (result) {
+                            // Call API using jQuery AJAX
+                            $.ajax({
+                                url: "/api/customersapi/" + button.attr("customer-id-attr"),
+                                method: "DELETE",
+                                success: function () {
+                                    table.row(button.parents("tr")).remove().draw(); // Removes from datatables internal list of customers and draw removes visually
+//                                button.parents("tr").remove().draw(); // Only removes the row from the table
+                                }
+                            });
+                        }
+                    });
+               
+                });
+
+        });
+
+
+    </script>
+}

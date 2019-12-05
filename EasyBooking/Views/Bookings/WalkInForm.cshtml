@@ -1,0 +1,81 @@
+﻿@model EasyBooking.Models.WalkInFormViewModel
+@{
+    ViewBag.Title = @Model.Title;
+}
+<h2>@Model.Title</h2>
+<hr />
+@Html.ValidationSummary(true, "Please fix the following errors.")
+@using (Html.BeginForm("OnSubmitWalkInForm", "Bookings"))
+{
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Seats)
+        @Html.TextBoxFor(m => m.Seats, new { @class = "form-control" })
+
+        @* @Html.DropDownListFor(m => m.Table.Id, new SelectList(Model.AvailableTables, "Id", "Seats"), "Select", new { @class = "form-control" }) *@
+        @Html.ValidationMessageFor(m => m.Seats)
+
+    </div>
+
+    <div class="form-group">
+
+        @Html.LabelFor(m => m.StartTime)
+        @Html.DropDownListFor(m => m.StartTime, Model.Hours, "Select start time", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.StartTime)
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.EndTime)
+        @Html.DropDownListFor(m => m.EndTime, Model.Hours, "Select end time", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.EndTime)
+
+    </div>
+    <button id="availabilitybtn" value="availb" name="submit" type="submit" class="btn btn-default">Check availability</button>
+
+                                                        
+    if (Model.AvailableTables == null)
+    {
+        <div class="form-group">
+            @Html.LabelFor(m => m.TablePlaceHolder)
+
+            @Html.DropDownListFor(m => m.TablePlaceHolder, Enumerable.Empty<SelectListItem>(), "Press 'Check availability'", new { @class = "form-control" })
+
+            @Html.ValidationMessageFor(m => m.TablePlaceHolder)
+
+        </div>
+    }
+    else
+    {
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.TableId)
+
+            @Html.DropDownListFor(m => m.TableId, new SelectList(Model.AvailableTables, "Id", "Id"), "Select", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.TableId)
+
+        </div>
+
+    }
+
+
+
+    @Html.HiddenFor(m => m.Id)
+    @Html.AntiForgeryToken()
+    if (Model.AvailableTables == null)
+    {
+        <button disabled id="savebtn" value="saveb" name="submit" type="submit" class="btn btn-primary">Save</button>
+        <p>*Check for availablity</p>
+
+    }
+    else
+    {
+        <button id="savebtn" value="saveb" name="submit" type="submit" class="btn btn-primary">Save</button>
+    }
+
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval");
+}

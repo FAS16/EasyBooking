@@ -1,0 +1,41 @@
+﻿@model EasyBooking.Models.CustomerFormViewModel
+@{
+    ViewBag.Title = "Customer form";
+}
+<h2>@Model.Title</h2>
+<hr/>
+
+@Html.ValidationSummary(true, "Please fix the following errors.")
+@using (Html.BeginForm("Save", "Customers"))
+{
+    <div class="form-group">
+        @Html.LabelFor(m => m.Name)
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Name)
+
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CountryCode)
+        @Html.TextBoxFor(m => m.CountryCode, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CountryCode)
+
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.PhoneNumber)
+        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PhoneNumber)
+
+    </div>
+
+
+    @Html.HiddenFor(m => m.Id)
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-primary">Save</button>
+
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval");
+}

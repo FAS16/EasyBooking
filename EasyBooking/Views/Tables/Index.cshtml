@@ -1,0 +1,65 @@
+﻿@model System.Collections.Generic.List<EasyBooking.Models.Table>
+
+@{
+    ViewBag.Title = "Tables";
+}
+
+<h2>Tables</h2>
+@Html.ActionLink("Add table", "Add", "Tables", null, new { @class = "btn-btm-margin btn btn-primary" })
+
+<table id="tables" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Seats</th>
+            <th class="delete-x"><b>x</b></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var table in Model)
+        {
+            <tr>
+                <td>@Html.ActionLink(table.Id.ToString(), "Edit", "Tables", new {id = table.Id}, null)</td>
+                <td>@table.Seats</td>
+                <td>
+                    <button table-id-attr="@table.Id" class="btn-link js-del">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+
+</table>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+           var table = $("#tables").DataTable();
+
+            // Get the tables table, listen to click event, and if the click event is raised from an element matching the selector "js-delete"
+            $("#tables").on("click",".js-del",
+                function () {
+                    var button = $(this);
+
+                    bootbox.confirm("Are you sure you want to delete this table?", function(result) {
+                        if (result) {
+                            // Call API using jQuery AJAX
+                            $.ajax({
+                                url: "/api/tablesapi/" + button.attr("table-id-attr"),
+                                method: "DELETE",
+                                success: function () {
+                                    table.row(button.parents("tr")).remove().draw(); // Removes from datatables internal list of tables and draw removes visually
+//                                button.parents("tr").remove().draw(); // Only removes the row from the table
+                                }
+                            });
+                        }
+                    });
+
+                });
+
+        });
+
+
+    </script>
+}

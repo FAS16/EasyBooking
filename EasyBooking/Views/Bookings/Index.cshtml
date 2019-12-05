@@ -1,0 +1,162 @@
+﻿@using EasyBooking.Models.Domain
+@model EasyBooking.Models.BookingsViewModel
+
+@{
+    ViewBag.Title = "Bookings";
+}
+
+<h2>Bookings</h2>
+<hr />
+
+@Html.ValidationSummary(true, "Error!")
+
+
+
+<h3>Reservations</h3>
+@Html.ActionLink("Add reservation", "AddReservation", "Bookings", null, new { @class = "btn-btm-margin btn btn-primary" })
+
+<table id="reservations" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Table</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Created</th>
+            <th>Customer</th>
+            <th>Note arrival</th>
+            <th class="delete-x"><b>x</b></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var reservation in Model.Reservations)
+        {
+            <tr>
+                <td>@Html.ActionLink(reservation.Id.ToString(), "EditReservation", "Bookings", new { id = reservation.Id }, null)</td>
+                <td>@Html.ActionLink(reservation.Table.Id.ToString(), "Edit", "Tables", new { id = reservation.Table.Id }, null)</td>
+                <td>@reservation.Start.ToShortDateString() @reservation.Start.ToShortTimeString()</td>
+                <td>@reservation.End.ToShortDateString() @reservation.End.ToShortTimeString()</td>
+                <td>@reservation.Created.ToShortDateString() @reservation.Created.ToShortTimeString()</td>
+                <td>@Html.ActionLink(reservation.Customer.Name, "Edit", "Customers", new { id = reservation.Customer.Id }, null)</td>
+                @if (reservation.Arrival == null)
+                {
+                    <td>@Html.ActionLink("Arrived", "NoteArrivalOfCustomer", "Bookings", new { id = reservation.Id }, null)</td>
+
+                }
+                else
+                {
+                    <td>@reservation.Arrival.Value.ToShortTimeString()</td>
+                }
+
+                <td>
+                    <button reservation-id-attr="@reservation.Id" class="btn-link js-del">Delete</button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+
+
+</table>
+
+
+
+
+<div style="margin-top: 75px">
+    <h3>Walk-ins</h3>
+    @Html.ActionLink("Add walk-in", "AddWalkIn", "Bookings", null, new { @class = "btn-btm-margin btn btn-primary" })
+
+    <table id="walkins" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Table</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Created</th>
+                <th class="delete-x"><b>x</b></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var walkIn in Model.WalkIns)
+            {
+                <tr>
+                    <td>@Html.ActionLink(walkIn.Id.ToString(), "EditWalkIn", "Bookings", new { id = walkIn.Id }, null)</td>
+
+                    <td>@Html.ActionLink(walkIn.Table.Id.ToString(), "Edit", "Tables", new { id = walkIn.Table.Id }, null)</td>
+
+                    <td>@walkIn.Start.ToShortDateString() @walkIn.Start.ToShortTimeString()</td>
+                    <td>@walkIn.End.ToShortDateString() @walkIn.End.ToShortTimeString()</td>
+                    <td>@walkIn.Created.ToShortDateString() @walkIn.Created.ToShortTimeString()</td>
+
+                    <td>
+                        <button walkin-id-attr="@walkIn.Id" class="btn-link js-del">Delete</button>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+
+
+    </table>
+</div>
+
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            var restTable = $("#reservations").DataTable();
+            var walkinTable = $("#walkins").DataTable();
+
+            // Get the bookings table, listen to click event, and if the click event is raised from an element matching the selector "js-delete"
+            $("#reservations").on("click", ".js-del",
+                function () {
+                    var button = $(this);
+
+                    bootbox.confirm("Are you sure you want to delete this booking?", function (result) {
+                        if (result) {
+                            // Call API using jQuery AJAX
+                            $.ajax({
+                                url: "/api/reservationsapi/" + button.attr("reservation-id-attr"),
+                                method: "DELETE",
+                                success: function () {
+                                    restTable.row(button.parents("tr")).remove().draw(); // Removes from datatables internal list of reservations and draw removes visually
+                                    //                                button.parents("tr").remove().draw(); // Only removes the row from the table
+                                }
+                            });
+                        }
+                    });
+
+                });
+
+
+            $("#walkins").on("click", ".js-del",
+                function () {
+                    var button = $(this);
+
+                    bootbox.confirm("Are you sure you want to delete this booking?", function (result) {
+                        if (result) {
+                            // Call API using jQuery AJAX
+                            $.ajax({
+                                url: "/api/walkinsapi/" + button.attr("walkin-id-attr"),
+                                method: "DELETE",
+                                success: function () {
+                                    walkinTable.row(button.parents("tr")).remove().draw(); // Removes from datatables internal list of walkins and draw removes visually
+                                    //                                button.parents("tr").remove().draw(); // Only removes the row from the table
+                                }
+                            });
+                        }
+                    });
+
+                });
+
+
+        });
+
+
+
+    </script>
+}

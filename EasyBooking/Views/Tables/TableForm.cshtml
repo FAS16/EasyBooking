@@ -1,0 +1,37 @@
+﻿@model EasyBooking.Models.TableFormViewModel
+@{
+    ViewBag.Title = "Table form";
+}
+<h2>@Model.Title</h2>
+<hr />
+
+@Html.ValidationSummary(true, "Please fix the following errors.")
+@using (Html.BeginForm("Save", "Tables"))
+{
+
+
+    if (Model.Id != 0)
+    {
+        <div class="form-group">
+            <p>Table @Model.Id</p>
+
+        </div>
+    }
+    
+    <div class="form-group">
+        @Html.LabelFor(m => m.Seats)
+        @Html.TextBoxFor(m => m.Seats, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Seats)
+
+    </div>
+
+
+    @Html.HiddenFor(m => m.Id)
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-primary">Save</button>
+
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval");
+}
